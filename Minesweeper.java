@@ -1,3 +1,6 @@
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.event.*;
 import java.net.URL;
@@ -124,6 +127,18 @@ public class Minesweeper implements ActionListener {
         gameTimer.start();
     }
 
+    void playSound(String filename) {
+        try {
+            // Load the sound file
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass().getResource(filename));
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     void addTilesActionListeners(int row, int col) {
         tiles[row][col].addMouseListener(
                 new MouseAdapter() {
@@ -148,6 +163,8 @@ public class Minesweeper implements ActionListener {
                                 tiles[row][col].setText("");
                             else
                                 tiles[row][col].setText("🚩");
+
+                            playSound("flag.wav");
                         }
                     }
                 });
@@ -156,6 +173,7 @@ public class Minesweeper implements ActionListener {
     void checkForGameOver(int row, int col) {
         // Loss
         if (mines.contains(board_size * row + col)) {
+            playSound("explosion.wav");
             for (int i = 0; i < board_size; i++) {
                 for (int j = 0; j < board_size; j++) {
                     if (boardState[i][j] == -1) {
